@@ -66,8 +66,14 @@ if __name__ == "__main__":
     print(f"Created empty population with {population.size} individuals")
     print(f"Population is empty: {population.is_empty()}")
 
-    print("\nInitializing population from LLM...")
-    population.initialize_from_llm()
+    print("\nInitializing population...")
+    population._individuals = [
+        "Knowledge is a belief that is both true and supported by sufficient evidence.",
+        "Knowledge is a true belief caused directly by the fact being believed.",
+        "Knowledge is a true belief produced by a consistently dependable cognitive process.",
+        "Knowledge is a successful belief arising from the agent's intellectual excellence or character.",
+        "Knowledge is a fundamental, unanalyzable mental state rather than a composite of parts.",
+    ]
     print(f"Population now has {population.size} individuals:")
     for i, individual in enumerate(population.individuals, 1):
         print(f"  {i}. {individual}")
