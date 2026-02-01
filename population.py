@@ -4,6 +4,7 @@ Evophil - Evolving Philosophy
 A module for evolving philosophical concepts using evolutionary algorithms.
 """
 
+import random
 from typing import List, Optional
 
 import anthropic
@@ -61,6 +62,35 @@ def create_population() -> Population:
     return Population()
 
 
+def crossover(definition1: str, definition2: str) -> str:
+    """Combine two definitions using an LLM to produce a new one.
+
+    Args:
+        definition1: The first definition of knowledge.
+        definition2: The second definition of knowledge.
+
+    Returns:
+        A new definition that combines elements of both inputs.
+    """
+    prompt = f"""Here are two definitions of knowledge:
+
+1. {definition1}
+2. {definition2}
+
+Please produce a new definition of knowledge that combines elements of each and is recognizably different from both. The new definition should be a single sentence. Output only the new definition, nothing else."""
+
+    client = anthropic.Anthropic()
+    message = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=256,
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    return message.content[0].text.strip()
+
+
 if __name__ == "__main__":
     population = create_population()
     print(f"Created empty population with {population.size} individuals")
@@ -77,3 +107,27 @@ if __name__ == "__main__":
     print(f"Population now has {population.size} individuals:")
     for i, individual in enumerate(population.individuals, 1):
         print(f"  {i}. {individual}")
+
+    # Main evolution loop
+    print("\n" + "=" * 60)
+    print("Starting evolution loop...")
+    print("=" * 60)
+
+    generation = 0
+    while True:
+        generation += 1
+        print(f"\n--- Generation {generation} ---")
+
+        # Randomly select two members of the population
+        parent1, parent2 = random.sample(population.individuals, 2)
+        print(f"Parent 1: {parent1}")
+        print(f"Parent 2: {parent2}")
+
+        # Ask LLM to combine them
+        print("\nCombining via LLM...")
+        offspring = crossover(parent1, parent2)
+        print(f"Offspring: {offspring}")
+
+        # Add the new definition to the population
+        population._individuals.append(offspring)
+        print(f"\nPopulation size: {population.size}")
